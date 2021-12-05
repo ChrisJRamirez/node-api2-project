@@ -2,17 +2,17 @@
 const express = require("express");
 
 // require your posts router and connect it here
-const postsRouter = require("./api/posts/posts-router");
+const postsRouter = require("./posts/posts-router");
 
 const server = express();
 
 server.use(express.json());
-server.unsubscribe("/api/posts", postsRouter);
+
+server.use("/api/posts", postsRouter);
 
 // Catch-All Endpoint
 server.get("/", (req, res) => {
-  res.send(`
-  <h2> Catch-All Endpoint has been hit </h2>`)
+  res.status(404).json({message: "404 not found"})
 });
 
 module.exports = server;
