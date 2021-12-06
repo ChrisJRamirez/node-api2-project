@@ -71,8 +71,40 @@ router.put("/:id", async (req, res) => {
   } catch(err){
     res.status(500).json({message: "The post information could not be modified"})
   }
+});
 
+// 5 [DELETE] /api/posts/:id
+router.delete("/:id", async (req, res) => {
+  const {id} = req.params
+  Post.remove(id)
+  const deletedPost = await Post.remove(id)
+  
+  try{
+    if(!deletedPost){
+      res.status(404).json({message: "The post with the specified ID does not exist"})
+    } else {
+      res.status(200).json({message: "The post has been removed"})
+    }
+  } catch(err){
+    res.status(500).json({message: "The post could not be removed"})
+  }
+});
 
+// 6 [GET] /api/posts/:id/comments
+router.get("/:id/comments", (req, res) => {
+  Post.findPostComments(req.params.id)
+    .then(posts => {
+      if(posts.length > 0){
+        res.status(200).json(posts);
+      } else {
+        res.status(404).json({message: "The post with the specified ID does not exist"})
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json9({message: "The comments information could not be retrieved"})
+    })
 })
+
 
 module.exports = router;
