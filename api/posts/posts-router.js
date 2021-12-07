@@ -10,13 +10,13 @@ router.get("/", (req, res) => {
     .then(posts => {
       res.status(200).json(posts);
     })
-    // .catch(error);
-    // console.log(error);
-    // res.status(500).json({
-    //   message: "The posts information could not be retrieved"
-    // })
-});
-
+    .catch(error => {
+      res.status(500).json({
+        message: "The post information could not be retrieved",
+        error: error.message
+      })
+    })
+  })
 
 // 2 [GET] /api/posts/:id
 router.get("/:id", (req, res) => {
@@ -38,16 +38,22 @@ router.get("/:id", (req, res) => {
 
 // 3 [POST] /api/posts
 router.post("/", (req, res) => {
-  const newPost = req.body;
-  if(!newPost.title || !newPost.contents) {
+  const {title, contents} = req.body;
+  if(!title || !contents) {
     res.status(400).json({message: "Please provide title and contents for the post"})
   } else {
-    Post.insert(newPost)
+    Post.insert({title, contents})
+      .then(({id})=> {
+        return Post.findById(id)
+      })
       .then(post => {
         res.status(201).json(post)
       })
       .catch(err => {
-        res.status(500).json({message: "There was an error while saving the post to the database"})
+        res.status(500).json({
+          message: "There was an error while saving the post to the database",
+          err:err.message
+        })
       })
   }
 });
